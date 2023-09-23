@@ -5,16 +5,16 @@ const app = express();
 const puerto = process.env.PORT || 3000;
 
 let categorias = [
-    { id: 1, nombre: 'Cocina' },
-    { id: 2, nombre: 'Electronica' },
-    { id: 3, nombre: 'Hogar' },
-    { id: 4, nombre: 'Jardín' },
-    { id: 5, nombre: 'Muebles' },
-    { id: 6, nombre: 'Ropa' },
-    { id: 7, nombre: 'Salud' },
-    { id: 8, nombre: 'Tecnología' },
-    { id: 9, nombre: 'Vehículos' },
-    { id: 10, nombre: 'Videojuegos' }
+    { id: 1, nombre: 'Cocina', descripcion: 'Cocina' },
+    { id: 2, nombre: 'Electronica', descripcion: 'Electronica' },
+    { id: 3, nombre: 'Hogar', descripcion: 'Hogar' },
+    { id: 4, nombre: 'Jardín', descripcion: 'Jardín' },
+    { id: 5, nombre: 'Muebles', descripcion: 'Muebles' },
+    { id: 6, nombre: 'Ropa', descripcion: 'Ropa' },
+    { id: 7, nombre: 'Salud', descripcion: 'Salud' },
+    { id: 8, nombre: 'Tecnología', descripcion: 'Tecnología' },
+    { id: 9, nombre: 'Vehículos', descripcion: 'Vehículos' },
+    { id: 10, nombre: 'Videojuegos', descripcion: 'Videojuegos' }
 
 ]
 
@@ -88,40 +88,60 @@ app.post('/socios/v1/categorias', jsonParser, (req, res) => {
 })
 app.put('/socios/v1/categorias/:id', (req, res) => {
     //Actualizar una categoria
-    const id = req.params.id;
-    const data = req.body;
-    console.log(data);
-    const categoria = categorias.find((categorias) => categorias.id == id);
-    if (categoria) {
-        res.status(200).json({
-            estado: 1,
-            mensaje: "Categoria actualizada correctamente",
-            categoria: categoria,
+    // ID viene en params
+    // nombre y descripcion vienen en el body
+
+    const {id} = req.params;
+    const {nombre, descripcion} = req.body;
+
+if (nombre == undefined || descripcion == undefined) {
+    res.status(400).json({
+        estado: 0,
+        mensaje: "BAD REQUEST Faltan parametros en la solicitud",
+    });
+}
+else {
+    const categoria = categorias.find((categorias) => categorias.id == id); //Busca el elemento en el arreglo
+    if (categoria) { //Si existe
+        categoria.nombre = nombre; //Actualiza el nombre con lo que viene en el body
+        categoria.descripcion = descripcion; //Actualiza la descripcion con lo que viene en el body
+        res.status(200).json({ //Envia la respuesta
+            estado: 1, //Estado 1 = OK
+            mensaje: "Categoria actualizada correctamente", //Mensaje
+            categoria: categoria, //Envia la categoria actualizada
         });
     } else {
-        res.status(404).json({
-            estado: 0,
-            mensaje: "No se actualizo",
+        res.status(404).json({  //Si no existe
+            estado: 0, //Estado 0 = Error
+            mensaje: "No se actualizo", //Mensaje
         });
     }
+}
+
 
 })
 app.delete('/socios/v1/categorias/:id', (req, res) => {
     //Eliminar una categoria
     const id = req.params.id;
-    const categoria = categorias.find((categorias) => categorias.id == id);
-    if (categoria) {
-        res.status(200).json({
-            estado: 1,
-            mensaje: "Categoria eliminada correctamente",
-            categoria: categoria,
+    const  categoria = categorias.find(categoria => categoria.id === parseInt(id)) //Busca la categoria
+    if (categoria) { //Si existe
+        const index = categorias.indexOf(categoria); //Obtiene el indice
+        categorias.splice(index, 1); //Elimina el elemento del arreglo
+        res.status(200).json({ //Envia la respuesta
+            estado: 1, //Estado 1 = OK
+            mensaje: "Categoria eliminada correctamente", //Mensaje
+            categoria: categoria, //Envia la categoria eliminada
         });
     } else {
-        res.status(404).json({
-            estado: 0,
-            mensaje: "No se elimino",
+        res.status(404).json({ //Si no existe
+            estado: 0, //Estado 0 = Error
+            mensaje: "No se elimino", //Mensaje
         });
     }
+
+
+
+
 
 
 
